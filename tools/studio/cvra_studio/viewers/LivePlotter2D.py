@@ -1,3 +1,4 @@
+from operator import itemgetter
 import queue
 
 import numpy as np
@@ -35,11 +36,17 @@ class LivePlotter2D:
 
                 self.ax.addLegend()
                 for index, variable in enumerate(data):
-                    x, y = close_polygon(polygon(data[variable]['x'],
-                                                 data[variable]['y'],
-                                                 data[variable].get('r', 100),
-                                                 data[variable].get('n', 6),
-                                                 data[variable].get('a', 0)))
+                    if 'pts' in data[variable].keys():
+                        pts = data[variable]['pts']
+                        x, y = list(map(itemgetter(0), pts)), list(map(itemgetter(1), pts))
+                    else:
+                        x, y = polygon(data[variable]['x'],
+                                       data[variable]['y'],
+                                       data[variable].get('r', 100),
+                                       data[variable].get('n', 6),
+                                       data[variable].get('a', 0))
+
+                    x, y = close_polygon([x, y])
                     plt.plot(
                         np.asarray(x).flatten(),
                         np.asarray(y).flatten(),
